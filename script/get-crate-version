@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <crate-name>"
+    exit 1
+fi
+
+crate="$1"
+cargo metadata --format-version 1 --no-deps \
+    | jq -r --arg crate "$crate" '.packages[] | select(.name == $crate) | .version'
