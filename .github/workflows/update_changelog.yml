@@ -21,7 +21,8 @@ jobs:
         run: |
           pr_number="${{ github.event.pull_request.number }}"
           pr_title="${{ github.event.pull_request.title }}"
-          sed -i.bak '/^## \[Unreleased\]/a\- '"${pr_title} (#${pr_number})" CHANGELOG.md
+          entry="- ${pr_title} (#${pr_number})"
+          printf '%s\n' "$entry" | sed -i.bak '/^## \[Unreleased\]/r /dev/stdin' CHANGELOG.md
           rm CHANGELOG.md.bak
       - name: Add to milestone
         env:
