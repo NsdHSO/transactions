@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <since-tag>"
+    exit 1
+fi
+
+SINCE_TAG="$1"
+
+published_at=$(gh release view "$SINCE_TAG" --json publishedAt -q .publishedAt 2>/dev/null || echo "")
+
+if [ -n "$published_at" ]; then
+    gh pr list --state merged --search "merged:>=$published_at" --json number,title,mergedAt
+else
+    gh pr list --state merged --json number,title,mergedAt
+fi
