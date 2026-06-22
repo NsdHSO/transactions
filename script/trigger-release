@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+which gh >/dev/null || brew install gh
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <stable|preview>"
+    exit 1
+fi
+
+CHANNEL="$1"
+
+if [ "$CHANNEL" == "nightly" ]; then
+    echo "nightly releases are not supported in this template"
+    exit 1
+fi
+
+version=$(script/get-crate-version app | sed 's/\.[^\.]*$/.x/')
+echo "Bumping $CHANNEL (v$version)"
+
+gh workflow run "bump_patch_version.yml" -f branch="v$version" -f channel="$CHANNEL"
+echo "Follow along at: https://github.com/$(git remote get-url origin | sed 's/.*github.com[:/]//;s/.git$//')/actions"
