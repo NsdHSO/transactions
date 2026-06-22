@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-which gh >/dev/null || brew install gh
+if ! command -v gh >/dev/null 2>&1; then
+    echo "Error: gh CLI is required. Install from https://cli.github.com/" >&2
+    exit 1
+fi
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <stable|preview>"

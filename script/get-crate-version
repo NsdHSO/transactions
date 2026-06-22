@@ -6,6 +6,11 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
+if ! command -v jq >/dev/null 2>&1; then
+    echo "Error: jq is required but not installed." >&2
+    exit 1
+fi
+
 crate="$1"
 cargo metadata --format-version 1 --no-deps \
     | jq -r --arg crate "$crate" '.packages[] | select(.name == $crate) | .version'
