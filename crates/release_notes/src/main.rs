@@ -1,5 +1,5 @@
 use clap::Parser;
-use release_notes::{format_release_notes, PullRequest};
+use release_notes::{PullRequest, format_release_notes};
 
 #[derive(Parser)]
 #[command(name = "release-notes")]
