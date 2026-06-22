@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+mkdir -p "$ROOT/.git/hooks"
+cp "$ROOT/script/pre-commit" "$ROOT/.git/hooks/pre-commit"
+chmod +x "$ROOT/.git/hooks/pre-commit"
+echo "pre-commit hook installed"
