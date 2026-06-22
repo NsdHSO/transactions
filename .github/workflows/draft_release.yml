@@ -14,6 +14,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+      - name: Install jq
+        run: sudo apt-get install -y jq
       - name: Build release_notes
         run: cargo build --release -p release_notes --bin release-notes
       - name: Determine release channel
