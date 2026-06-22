@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <release-notes-file>"
+    exit 1
+fi
+
+NOTES_FILE="$1"
+preview=""
+if [[ "$GITHUB_REF_NAME" == *"-pre" ]]; then
+    preview="-p"
+fi
+
+gh release view "$GITHUB_REF_NAME" || \
+    gh release create -t "$GITHUB_REF_NAME" -d "$GITHUB_REF_NAME" -F "$NOTES_FILE" $preview
