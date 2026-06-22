@@ -21,13 +21,15 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch }}
       - uses: dtolnay/rust-toolchain@stable
+      - name: Install jq
+        run: sudo apt-get install -y jq
       - name: Bump version
         run: |
           version=$(script/get-crate-version app)
           IFS='.' read -r major minor patch <<< "$version"
           new_patch=$((patch + 1))
           new_version="${major}.${minor}.${new_patch}"
-          sed -i.bak "s/^version = \"${version}\"/version = \"${new_version}\"/" Cargo.toml
+          sed -i.bak "/^\[workspace.package\]/,/^\[/s/^version = \"${version}\"/version = \"${new_version}\"/" Cargo.toml
           rm Cargo.toml.bak
           # Move Unreleased changelog entries to new version section
           sed -i.bak "s/^## \[Unreleased\]/## [Unreleased]\n\n## [${new_version}] - $(date +%Y-%m-%d)/" CHANGELOG.md
