@@ -17,7 +17,7 @@ jobs:
         run: cargo build --release -p release_notes --bin release-notes
       - name: Post draft release note
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           echo '[{"number":${{ github.event.pull_request.number }},"title":"${{ github.event.pull_request.title }}","body":null,"merged_at":null,"labels":[]}]' | \
             ./target/release/release-notes > /tmp/note.txt

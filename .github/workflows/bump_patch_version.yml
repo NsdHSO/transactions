@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Release branch (e.g., v0.1.x)'
+        description: "Release branch (e.g., v0.1.x)"
         required: true
       channel:
-        description: 'Release channel (stable or preview)'
+        description: "Release channel (stable or preview)"
         required: true
-        default: 'stable'
+        default: "stable"
 
 jobs:
   bump:
@@ -36,7 +36,7 @@ jobs:
           rm CHANGELOG.md.bak
       - name: Commit and tag
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           version=$(script/get-crate-version app)
           channel=${{ github.event.inputs.channel }}

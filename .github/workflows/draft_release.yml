@@ -3,7 +3,7 @@ name: Draft Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   release:
@@ -22,7 +22,7 @@ jobs:
         run: script/determine-release-channel
       - name: Collect release notes
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           previous=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
           if [ -n "$previous" ]; then
@@ -35,6 +35,6 @@ jobs:
         env:
           GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_REF: ${{ github.ref }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           script/create-draft-release /tmp/release_notes.md
