@@ -1,0 +1,38 @@
+name: Draft Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build release_notes
+        run: cargo build --release -p release_notes --bin release-notes
+      - name: Determine release channel
+        run: script/determine-release-channel
+      - name: Collect release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          previous=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          if [ -n "$previous" ]; then
+            script/get-release-notes-since "$previous" > /tmp/notes.json
+          else
+            echo '[]' > /tmp/notes.json
+          fi
+          cat /tmp/notes.json | ./target/release/release-notes > /tmp/release_notes.md || true
+      - name: Create draft release
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_REF: ${{ github.ref }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          script/create-draft-release /tmp/release_notes.md

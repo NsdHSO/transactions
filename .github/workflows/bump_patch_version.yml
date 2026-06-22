@@ -1,0 +1,51 @@
+name: Bump Patch Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Release branch (e.g., v0.1.x)'
+        required: true
+      channel:
+        description: 'Release channel (stable or preview)'
+        required: true
+        default: 'stable'
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Bump version
+        run: |
+          version=$(script/get-crate-version app)
+          IFS='.' read -r major minor patch <<< "$version"
+          new_patch=$((patch + 1))
+          new_version="${major}.${minor}.${new_patch}"
+          sed -i.bak "s/^version = \"${version}\"/version = \"${new_version}\"/" Cargo.toml
+          rm Cargo.toml.bak
+          # Move Unreleased changelog entries to new version section
+          sed -i.bak "s/^## \[Unreleased\]/## [Unreleased]\n\n## [${new_version}] - $(date +%Y-%m-%d)/" CHANGELOG.md
+          rm CHANGELOG.md.bak
+      - name: Commit and tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version=$(script/get-crate-version app)
+          channel=${{ github.event.inputs.channel }}
+          tag="v${version}"
+          if [ "$channel" == "preview" ]; then
+            tag="${tag}-pre"
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Cargo.toml CHANGELOG.md
+          git commit -m "chore: bump version to ${version}"
+          git tag "$tag"
+          git push
+          git push origin "$tag"

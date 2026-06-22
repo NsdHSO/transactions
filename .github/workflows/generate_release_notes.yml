@@ -1,0 +1,24 @@
+name: Generate Release Notes
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build release_notes
+        run: cargo build --release -p release_notes --bin release-notes
+      - name: Post draft release note
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo '[{"number":${{ github.event.pull_request.number }},"title":"${{ github.event.pull_request.title }}","body":null,"merged_at":null,"labels":[]}]' | \
+            ./target/release/release-notes > /tmp/note.txt
+          gh pr comment ${{ github.event.pull_request.number }} --body "**Draft release note:**\n\n$(cat /tmp/note.txt)"
