@@ -1,4 +1,4 @@
-use release_notes::{Label, PullRequest, format_release_note, format_release_notes};
+use release_notes::{PullRequest, format_release_note, format_release_notes};
 
 fn pr(number: u64, title: &str) -> PullRequest {
     PullRequest {
