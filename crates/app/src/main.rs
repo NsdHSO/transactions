@@ -1,39 +1,28 @@
-use gpui::{
-    App, Application, Bounds, Context, SharedString, Window, WindowBounds, WindowOptions, div,
-    prelude::*, px, rgb, size,
-};
+// use std::ops::Rem;
 
-struct HelloWorld {
-    text: SharedString,
-}
-
-impl Render for HelloWorld {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        div()
-            .flex()
-            .flex_col()
-            .gap_3()
-            .bg(rgb(0x505050))
-            .size(px(500.0))
-            .justify_center()
-            .items_center()
-            .text_xl()
-            .text_color(rgb(0xffffff))
-            .child(format!("Hello, {}!", &self.text))
-    }
-}
+use components::panes::{HelloWorld, HelloWorld1};
+use gpui::{App, AppContext, Application, Bounds, WindowBounds, WindowOptions, px, rems, size};
+use split::Split;
 
 fn main() {
     Application::new().run(|cx: &mut App| {
-        let bounds = Bounds::centered(None, size(px(500.0), px(500.0)), cx);
+        let bounds = Bounds::centered(None, size(rems(1000.0), px(500.0)), cx);
         cx.open_window(
             WindowOptions {
                 window_bounds: Some(WindowBounds::Windowed(bounds)),
                 ..Default::default()
             },
             |_, cx| {
-                cx.new(|_| HelloWorld {
+                let left = cx.new(|_| HelloWorld {
                     text: "World".into(),
+                });
+                let right = cx.new(|_| HelloWorld1 {
+                    text: "World1".into(),
+                });
+                cx.new(|_| Split {
+                    left,
+                    right,
+                    left_width: 500.0,
                 })
             },
         )

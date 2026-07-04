@@ -1,5 +1,5 @@
 [package]
-name = "app"
+name = "components"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -8,8 +8,6 @@ repository.workspace = true
 
 [dependencies]
 gpui.workspace = true
-components = { path = "../components" }
-split = { path = "../split" }
 
 [lints.clippy]
 all = "warn"
