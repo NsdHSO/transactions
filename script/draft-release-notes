@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# Build a draft Markdown release-notes file between two tags.
+#
+# Mirrors the workflow of zed's script/draft-release-notes.
+# For each commit in <prior-tag>..<tag> whose subject ends with "(#NNN)":
+#   - If the PR body contains a "Release notes:" section, emit that section.
+#   - Otherwise emit "- <subject-without-(#NNN)> ([#NNN](<repo>/pull/NNN))".
+# Commits without a PR number are skipped (note counted to stderr).
+#
+# Writes the notes to <output-file> (default: stdout) suitable for feeding
+# to `script/create-draft-release`.
+#
+# Usage:
+#   script/draft-release-notes <tag> [<prior-tag>] [> notes.md]
+set -euo pipefail
+
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+    echo "Usage: $0 <tag> [<prior-tag>]"
+    echo "       (prior-tag defaults to the tag before <tag> by git describe)"
+    exit 1
+fi
+
+TAG="$1"
+PRIOR_TAG="${2:-}"
+if [ -z "$PRIOR_TAG" ]; then
+    PRIOR_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || echo "")
+    if [ -z "$PRIOR_TAG" ]; then
+        echo "error: could not determine prior tag; pass it explicitly" >&2
+        exit 1
+    fi
+fi
+
+REPO=$(git remote get-url origin)
+case "$REPO" in
+    git@github.com:*) REPO="https://github.com/${REPO#git@github.com:}" ;;
+esac
+REPO="${REPO%.git}"
+
+notes_lines=()
+skipped=0
+missing=0
+
+# Stream commits; one record per commit separated by ASCII 0x1F (unit separator).
+while IFS= read -r -d '' commit; do
+    subject=$(printf '%s' "$commit" | head -n1)
+    body=$(printf '%s' "$commit" | tail -n +2)
+
+    # Extract PR number from subject ending in "(#NNN)"; otherwise skip.
+    if [[ "$subject" =~ \((#[0-9]+)\)$ ]]; then
+        pr_token=${BASH_REMATCH[1]}
+        pr_num=${pr_token#\#}
+        title=${subject%\ \((#$pr_num)\)}
+    else
+        skipped=$((skipped+1))
+        continue
+    fi
+
+    link="$REPO/pull/$pr_num"
+
+    # Try to pull a "Release notes:" (case-insensitive) section from the body.
+    release_section=$(printf '%s\n' "$body" | awk '
+        BEGIN { IGNORECASE=1; in_section=0; blank_count=0 }
+        /^[[:space:]]*[Rr]elease[[:space:]]+notes?:[[:space:]]*/ { in_section=1; sub(/^[[:space:]]*[Rr]elease[[:space:]]+notes?:[[:space:]]*/, ""); if (length($0) > 0) print; next }
+        in_section {
+            # End the section on a blank line followed by another blank line (paragraph break)
+            if ($0 ~ /^[[:space:]]*$/) { if (++blank_count >= 1) exit; next }
+            blank_count=0
+            print
+        }
+    ' | sed '/^[[:space:]]*$/d')
+
+    if [ -z "$release_section" ]; then
+        # No explicit release-notes section; use title + link.
+        notes_lines+=("- $title ([$pr_token]($link))")
+        missing=$((missing+1))
+    else
+        # If the section already contains a link to the PR, emit as-is.
+        if printf '%s' "$release_section" | grep -q "github.com.*/pull/$pr_num"; then
+            notes_lines+=("$release_section")
+        else
+            notes_lines+=("$release_section ([$pr_token]($link))")
+        fi
+    fi
+done < <(
+    # Field separator 0x1E (record), newline inside; safer than %B for body which may be huge.
+    git log "${PRIOR_TAG}..${TAG}" \
+        --no-merges \
+        --format=$'%s\n%b%x1f' \
+        -z
+)
+
+if [ "${#notes_lines[@]}" -eq 0 ]; then
+    compare_url="$REPO/compare/${PRIOR_TAG}...${TAG}#commits_bucket"
+    printf 'No public-facing changes in this release. [View the commits](%s).\n' "$compare_url"
+else
+    printf '%s\n' "${notes_lines[@]}"
+    printf '\n'
+fi
+
+if [ "$skipped" -gt 0 ] || [ "$missing" -gt 0 ]; then
+    printf '\n<!-- %d commits skipped (no PR number); %d release-note lines had no "Release notes:" section. -->\n' "$skipped" "$missing" >&2
+fi

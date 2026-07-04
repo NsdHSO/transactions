@@ -1,17 +1,57 @@
 #!/usr/bin/env bash
+# Emit release notes since a tag.
+#
+#   $ script/get-release-notes-since v0.1.0            # JSON of merged PRs
+#   $ script/get-release-notes-since v0.1.0 --md       # Markdown via release_notes
+#   $ script/get-release-notes-since v0.1.0 --md --publish v0.2.0
+#
+# Requires: gh CLI. For --md, additionally requires cargo to build release_notes.
 set -euo pipefail
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <since-tag>"
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 <since-tag> [--md] [--publish <tag>] [--repo <url>]"
     exit 1
 fi
 
-SINCE_TAG="$1"
+SINCE_TAG="$1"; shift
+
+FORMAT=json
+PUBLISH=""
+REPO=""
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --md)        FORMAT=md; shift ;;
+        --publish)   PUBLISH="$2"; shift 2 ;;
+        --repo)      REPO="$2"; shift 2 ;;
+        *) echo "unknown arg: $1" >&2; exit 1 ;;
+    esac
+done
 
 published_at=$(gh release view "$SINCE_TAG" --json publishedAt -q .publishedAt 2>/dev/null || echo "")
-
 if [ -n "$published_at" ]; then
-    gh pr list --state merged --search "merged:>=$published_at" --json number,title,mergedAt
+    json=$(gh pr list --state merged --search "merged:>=$published_at" --json number,title,mergedAt)
 else
-    gh pr list --state merged --json number,title,mergedAt
+    json=$(gh pr list --state merged --json number,title,mergedAt)
 fi
+
+if [ "$FORMAT" = json ]; then
+    printf '%s\n' "$json"
+    exit 0
+fi
+
+# Resolve repo URL.
+if [ -z "$REPO" ]; then
+    REPO=$(git remote get-url origin)
+fi
+# Convert git@github.com: OWNER/REPO.git -> https url
+case "$REPO" in
+    git@github.com:*) REPO="https://github.com/${REPO#git@github.com:}" ;;
+esac
+REPO="${REPO%.git}"
+
+extra_args=(--repo "$REPO")
+if [ -n "$PUBLISH" ]; then
+    extra_args+=(--publish "$PUBLISH")
+fi
+
+printf '%s' "$json" | cargo run --quiet -p release_notes -- "${extra_args[@]}"

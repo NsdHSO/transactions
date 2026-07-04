@@ -14,13 +14,21 @@ pub struct Label {
     pub name: String,
 }
 
-pub fn format_release_note(pr: &PullRequest) -> String {
-    format!("- {} (#{})", pr.title, pr.number)
+/// Format one PR line as Markdown: `- <title> ([#<n>](<repo>/pull/<n>))`.
+/// `repo_url` is normalized by stripping a trailing `/` so callers may pass
+/// either `https://github.com/O/R` or `https://github.com/O/R/`.
+pub fn format_release_note(pr: &PullRequest, repo_url: &str) -> String {
+    let base = repo_url.trim_end_matches('/');
+    format!(
+        "- {} ([#{}]({}/pull/{}))",
+        pr.title, pr.number, base, pr.number
+    )
 }
 
-pub fn format_release_notes(prs: &[PullRequest]) -> String {
+/// Format many PRs joined by newlines.
+pub fn format_release_notes(prs: &[PullRequest], repo_url: &str) -> String {
     prs.iter()
-        .map(format_release_note)
+        .map(|p| format_release_note(p, repo_url))
         .collect::<Vec<_>>()
         .join("\n")
 }
