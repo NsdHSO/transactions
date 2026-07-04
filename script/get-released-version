@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Print the version string of the most recent GitHub release.
+#
+# Usage:
+#   script/get-released-version                # latest release (any channel)
+#   script/get-released-version preview        # latest -pre release only
+#   script/get-released-version stable         # latest non-pre release only
+set -euo pipefail
+
+CHANNEL="${1:-any}"
+
+case "$CHANNEL" in
+    stable|preview|any) ;;
+    *) echo "Usage: $0 [stable|preview|any]" >&2; exit 1 ;;
+esac
+
+releases_json=$(gh release list --json tagName,isDraft,isPrerelease \
+    --exclude-drafts --limit 100)
+
+case "$CHANNEL" in
+    stable)
+        tag=$(printf '%s' "$releases_json" \
+            | jq -r '.[] | select(.isPrerelease == false) | .tagName' \
+            | head -n1)
+        ;;
+    preview)
+        tag=$(printf '%s' "$releases_json" \
+            | jq -r '.[] | select(.isPrerelease == true) | .tagName' \
+            | head -n1)
+        ;;
+    any)
+        tag=$(printf '%s' "$releases_json" | jq -r '.[0].tagName')
+        ;;
+esac
+
+if [ -z "$tag" ] || [ "$tag" = "null" ]; then
+    echo "error: no releases found for channel=$CHANNEL" >&2
+    exit 1
+fi
+
+# Strip leading 'v' to print a bare version, mirroring zed's get-released-version.
+echo "${tag#v}"

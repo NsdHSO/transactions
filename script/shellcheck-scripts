@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Lint every shell script under script/ with shellcheck.
+#
+# Mirrors zed's script/shellcheck-scripts.
+# Usage:
+#   script/shellcheck-scripts [error|warning]   (default: error)
+set -euo pipefail
+
+mode=${1:-error}
+[[ "$mode" =~ ^(error|warning)$ ]] || { echo "Usage: $0 [error|warning]"; exit 1; }
+
+cd "$(dirname "$0")/.." || exit 1
+
+if ! command -v shellcheck >/dev/null 2>&1; then
+    echo "error: shellcheck is not installed. Install: brew install shellcheck" >&2
+    exit 1
+fi
+
+# Find shell scripts (shebang = bash/sh/dash) and lint them all.
+find script -maxdepth 1 -type f -print0 |
+    xargs -0 grep -l -E '^#!(/bin/|/usr/bin/env )(sh|bash|dash)' 2>/dev/null |
+    xargs -r shellcheck -x -S "$mode" -C

@@ -1,15 +1,12 @@
-// use std::ops::Rem;
-
 use components::panes::{HelloWorld, HelloWorld1};
-use gpui::{App, AppContext, Application, Bounds, WindowBounds, WindowOptions, px, rems, size};
+use gpui::{App, AppContext, Application, Bounds, WindowBounds, WindowOptions};
 use split::Split;
 
 fn main() {
     Application::new().run(|cx: &mut App| {
-        let bounds = Bounds::centered(None, size(rems(1000.0), px(500.0)), cx);
         cx.open_window(
             WindowOptions {
-                window_bounds: Some(WindowBounds::Windowed(bounds)),
+                window_bounds: Some(WindowBounds::Maximized(Bounds::default())),
                 ..Default::default()
             },
             |_, cx| {

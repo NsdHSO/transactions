@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Bump the workspace version across the repo.
+#
+# Mirrors zed's script/bump-zed-version but adapted to a single shared
+# workspace version (we use [workspace.package].version in root Cargo.toml
+# and inherit via `version.workspace = true` in each crate).
+#
+# Usage:
+#   script/bump-crate-version <major|minor|patch> [--no-commit]
+#
+# Without --no-commit the script stages Cargo.toml + Cargo.lock and commits
+# with the message "Bump version to <new-version>". It does NOT push or tag;
+# push / tag is left to the operator (or the release workflow).
+set -euo pipefail
+
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+    echo "Usage: $0 <major|minor|patch> [--no-commit]"
+    exit 1
+fi
+
+BUMP="$1"
+COMMIT=1
+[ "${2:-}" = "--no-commit" ] && COMMIT=0
+
+case "$BUMP" in
+    major|minor|patch) ;;
+    *) echo "error: bump must be major|minor|patch" >&2; exit 1 ;;
+esac
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+if ! command -v jq >/dev/null 2>&1; then
+    echo "error: jq is required but not installed." >&2
+    exit 1
+fi
+
+CURRENT=$(script/get-crate-version app)
+IFS='.' read -r MAJOR MINOR PATCH <<<"$CURRENT"
+case "$BUMP" in
+    major) MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0 ;;
+    minor) MINOR=$((MINOR+1)); PATCH=0 ;;
+    patch) PATCH=$((PATCH+1)) ;;
+esac
+NEW="$MAJOR.$MINOR.$PATCH"
+
+echo "Bumping version: $CURRENT -> $NEW"
+
+# Patch root Cargo.toml [workspace.package].version — preserve formatting.
+# We use sed on the line, scoped to before any [dependencies] section.
+python3 - <<PY
+import re, sys
+path = "Cargo.toml"
+with open(path) as f:
+    src = f.read()
+# Replace the version under [workspace.package] only.
+m = re.search(r"^(\[workspace\.package\][^\[]*?version\s*=\s*)\"[^\"]+\"", src, re.M | re.S)
+if not m:
+    sys.exit("error: [workspace.package].version not found in root Cargo.toml")
+new = m.group(1) + "\"$NEW\""
+patched = src[:m.start()] + new + src[m.end():]
+with open(path, "w") as f:
+    f.write(patched)
+PY
+
+# Refresh Cargo.lock without rebuilding.
+cargo generate-lockfile --quiet 2>/dev/null || cargo update --workspace --quiet
+
+if [ "$COMMIT" -eq 1 ]; then
+    git add Cargo.toml Cargo.lock
+    git commit -m "Bump version to $NEW" >/dev/null
+    echo "Committed: Bump version to $NEW (not pushed; tag/push manually)"
+else
+    echo "Staged changes left uncommitted (--no-commit)"
+fi

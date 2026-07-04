@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# List merged pull requests since a date (or since a tag's publish date).
+#
+# Usage:
+#   script/get-pull-requests-since 2026-06-01
+#   script/get-pull-requests-since v0.1.0
+#
+# Output: one line per PR:  "#NNN  <title>  (<mergedAt>)"
+set -euo pipefail
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <YYYY-MM-DD | tag>"
+    exit 1
+fi
+
+ARG="$1"
+START_DATE=""
+if [[ "$ARG" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+    START_DATE="$ARG"
+else
+    # Treat as a tag: use its publishedAt (or creation date if unpublished).
+    published_at=$(gh release view "$ARG" --json publishedAt -q .publishedAt 2>/dev/null || echo "")
+    if [ -z "$published_at" ]; then
+        # Fall back to the tag's commit date.
+        START_DATE=$(git log -1 --format=%cs "$ARG")
+    else
+        # GitHub returns ISO; slice YYYY-MM-DD.
+        START_DATE=${published_at%%T*}
+    fi
+fi
+
+if [ -z "$START_DATE" ]; then
+    echo "error: could not resolve start date from '$ARG'" >&2
+    exit 1
+fi
+
+echo "# Pull requests merged since $START_DATE"
+echo
+
+gh pr list --state merged --search "merged:>=$START_DATE" \
+    --json number,title,mergedAt \
+    --template '#{{ .number }}  {{ .title }}  ({{ .mergedAt }}){{ "\n" }}'
