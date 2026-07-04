@@ -4,7 +4,6 @@ use gpui::{
 
 pub struct HelloWorld1 {
     pub text: SharedString,
-    pub input: Entity<InputField>,
 }
 
 impl Render for HelloWorld1 {
