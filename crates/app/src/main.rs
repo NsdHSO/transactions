@@ -1,11 +1,17 @@
 use components::panes::{HelloWorld, HelloWorld1};
-use gpui::{App, AppContext, Application, Bounds, WindowBounds, WindowOptions};
+use gpui::{App, AppContext, Application, Bounds, TitlebarOptions, WindowBounds, WindowOptions};
 use split::Split;
 
 fn main() {
     Application::new().run(|cx: &mut App| {
         cx.open_window(
             WindowOptions {
+                focus: true,
+                titlebar: Some(TitlebarOptions {
+                    title: Some("My App".into()),
+                    appears_transparent: true,
+                    traffic_light_position: None,
+                }),
                 window_bounds: Some(WindowBounds::Maximized(Bounds::default())),
                 ..Default::default()
             },
