@@ -1,6 +1,4 @@
-use gpui::{
-    Context, Entity, IntoElement, ParentElement, Render, SharedString, Styled, Window, div, rgb,
-};
+use gpui::{Context, IntoElement, ParentElement, Render, SharedString, Styled, Window, div, rgb};
 
 pub struct HelloWorld1 {
     pub text: SharedString,
