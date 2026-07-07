@@ -8,6 +8,9 @@ repository.workspace = true
 
 [dependencies]
 gpui.workspace = true
+gpui-platform.workspace = true
+gpui-component.workspace = true
+anyhow.workspace = true
 components = { path = "../components" }
 split = { path = "../split" }
 
