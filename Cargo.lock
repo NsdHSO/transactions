@@ -222,10 +222,11 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "components",
+ "danubius",
  "gpui",
- "gpui-component",
  "gpui_platform",
  "split",
+ "zalmoxis",
 ]
 
 [[package]]
@@ -1047,8 +1048,10 @@ checksum = "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570"
 name = "components"
 version = "0.1.0"
 dependencies = [
+ "danubius",
  "gpui",
  "gpui-component",
+ "zalmoxis",
 ]
 
 [[package]]
@@ -1332,6 +1335,14 @@ checksum = "fb22e947478ccf9dc44d8922042c677a63fbb88f2cb468521d1145816e5087cb"
 dependencies = [
  "link-section",
  "linktime-proc-macro",
+]
+
+[[package]]
+name = "danubius"
+version = "0.1.0"
+dependencies = [
+ "gpui",
+ "zalmoxis",
 ]
 
 [[package]]
@@ -7950,6 +7961,13 @@ dependencies = [
  "quote",
  "syn",
  "synstructure",
+]
+
+[[package]]
+name = "zalmoxis"
+version = "0.1.0"
+dependencies = [
+ "gpui",
 ]
 
 [[package]]

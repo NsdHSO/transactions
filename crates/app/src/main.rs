@@ -1,13 +1,28 @@
-use components::panes::{HelloWorld, HelloWorld1};
+use components::{HelloWorld, panes::HelloWorld1};
 use gpui::{AsyncApp, Bounds, WindowBounds, WindowOptions, *};
-use gpui_component::Root;
 use split::Split;
+
+struct Root {
+    split: Entity<Split>,
+}
+
+impl Root {
+    fn new(split: Entity<Split>, _window: &mut Window, _cx: &mut Context<Self>) -> Self {
+        Self { split }
+    }
+}
+
+impl Render for Root {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+        self.split.clone()
+    }
+}
 
 fn main() {
     let app = gpui_platform::application();
 
     app.run(move |cx: &mut App| {
-        gpui_component::init(cx);
+        zalmoxis::init(cx);
 
         cx.spawn(async move |cx: &mut AsyncApp| {
             cx.open_window(
@@ -17,6 +32,8 @@ fn main() {
                     ..Default::default()
                 },
                 |window, cx| {
+                    zalmoxis::init_and_observe(window, cx);
+
                     let left = cx.new(|_| HelloWorld {
                         text: "World".into(),
                     });
