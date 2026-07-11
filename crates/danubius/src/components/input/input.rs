@@ -145,6 +145,7 @@ impl RenderOnce for Input {
                 state.set_placeholder(text.clone());
             }
             state.set_text_colors(text_color, placeholder_color);
+            state.set_selection_background(colors.primary.opacity(0.3));
         });
 
         let height = self.size.height_px();
@@ -165,7 +166,10 @@ impl RenderOnce for Input {
                 state.update(cx, |s, cx| {
                     if k.modifiers.platform {
                         match k.key.as_str() {
-                            "a" => s.move_end(),
+                            "a" => {
+                                s.select_all();
+                                cx.notify();
+                            }
                             "c" => {
                                 let text = s.value().to_string();
                                 if !text.is_empty() {
