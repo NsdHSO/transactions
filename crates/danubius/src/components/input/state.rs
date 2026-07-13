@@ -207,25 +207,24 @@ impl Render for InputState {
             self.text_color
         };
 
-        if let Some(range) = &self.selection {
-            if !is_placeholder
-                && !range.is_empty()
-                && range.start < display_text.len()
-                && range.end <= display_text.len()
-            {
-                let text = display_text.to_string();
-                let before = text[..range.start].to_string();
-                let selected = text[range.start..range.end].to_string();
-                let after = text[range.end..].to_string();
+        if let Some(range) = &self.selection
+            && !is_placeholder
+            && !range.is_empty()
+            && range.start < display_text.len()
+            && range.end <= display_text.len()
+        {
+            let text = display_text.to_string();
+            let before = text[..range.start].to_string();
+            let selected = text[range.start..range.end].to_string();
+            let after = text[range.end..].to_string();
 
-                return div()
-                    .flex()
-                    .flex_1()
-                    .text_color(color)
-                    .child(before)
-                    .child(div().bg(self.selection_background).child(selected))
-                    .child(after);
-            }
+            return div()
+                .flex()
+                .flex_1()
+                .text_color(color)
+                .child(before)
+                .child(div().bg(self.selection_background).child(selected))
+                .child(after);
         }
 
         div().flex().flex_1().text_color(color).child(display_text)

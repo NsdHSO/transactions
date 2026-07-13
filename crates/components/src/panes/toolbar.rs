@@ -14,6 +14,12 @@ impl Toolbar {
     }
 }
 
+impl Default for Toolbar {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Render for Toolbar {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let colors = cx.zalmoxis_colors().clone();
