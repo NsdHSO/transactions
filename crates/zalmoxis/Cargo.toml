@@ -1,5 +1,5 @@
 [package]
-name = "app"
+name = "zalmoxis"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -8,12 +8,6 @@ repository.workspace = true
 
 [dependencies]
 gpui.workspace = true
-gpui-platform.workspace = true
-anyhow.workspace = true
-zalmoxis.workspace = true
-danubius.workspace = true
-components = { path = "../components" }
-split = { path = "../split" }
 
 [lints.clippy]
 all = "warn"

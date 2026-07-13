@@ -8,6 +8,9 @@ repository.workspace = true
 
 [dependencies]
 gpui.workspace = true
+gpui-component.workspace = true
+danubius.workspace = true
+zalmoxis.workspace = true
 
 [lints.clippy]
 all = "warn"
