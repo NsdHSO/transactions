@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Format Rust code and re-stage files that were already staged.
 cargo fmt
 git update-index --again
+cargo clippy --workspace -- -D warnings
