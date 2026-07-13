@@ -16,6 +16,6 @@ impl Render for HelloWorld {
             .items_center()
             .text_xl()
             .text_color(rgb(0xffffff))
-            .child(format!("Hello, {}!", &self.text))
+            .child(format!("Hello, {}!", self.text))
     }
 }
