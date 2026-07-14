@@ -161,14 +161,14 @@ impl RenderOnce for Input {
             let on_change_inner = on_change;
             move |keystroke: &gpui::KeyDownEvent, window: &mut Window, cx: &mut App| {
                 let k = &keystroke.keystroke;
-                let mut changed = false;
-
+                let mut changed: bool = false;
                 state.update(cx, |s, cx| {
+                    let mut redraw = false;
                     if k.modifiers.platform {
                         match k.key.as_str() {
                             "a" => {
                                 s.select_all();
-                                cx.notify();
+                                redraw = true;
                             }
                             "c" => {
                                 let text = s.value().to_string();
@@ -196,6 +196,9 @@ impl RenderOnce for Input {
                             }
                             _ => {}
                         }
+                        if redraw {
+                            cx.notify();
+                        }
                         return;
                     }
 
@@ -208,16 +211,31 @@ impl RenderOnce for Input {
                             s.delete(cx);
                             changed = true;
                         }
-                        "left" => s.move_left(),
-                        "right" => s.move_right(),
-                        "home" => s.move_home(),
-                        "end" => s.move_end(),
+                        "left" => {
+                            s.move_left();
+                            redraw = true
+                        }
+                        "right" => {
+                            s.move_right();
+                            redraw = true
+                        }
+                        "home" => {
+                            s.move_home();
+                            redraw = true
+                        }
+                        "end" => {
+                            s.move_end();
+                            redraw = true
+                        }
                         _ => {
                             if let Some(ch) = &k.key_char {
                                 s.insert_text(ch, cx);
                                 changed = true;
                             }
                         }
+                    }
+                    if redraw {
+                        cx.notify();
                     }
                 });
 
