@@ -2,7 +2,7 @@ use std::ops::Range;
 
 use gpui::{
     App, Context, EventEmitter, FocusHandle, Focusable, Hsla, IntoElement, ParentElement, Render,
-    SharedString, Styled, Window, div,
+    SharedString, Styled, Window, div, px,
 };
 
 #[derive(Clone)]
@@ -194,7 +194,7 @@ impl Focusable for InputState {
 }
 
 impl Render for InputState {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         let is_placeholder = self.value.is_empty() && !self.placeholder.is_empty();
         let display_text = if is_placeholder {
             self.placeholder.clone()
@@ -206,6 +206,7 @@ impl Render for InputState {
         } else {
             self.text_color
         };
+        let is_focused = self.focus_handle.is_focused(window);
 
         if let Some(range) = &self.selection
             && !is_placeholder
@@ -224,6 +225,20 @@ impl Render for InputState {
                 .text_color(color)
                 .child(before)
                 .child(div().bg(self.selection_background).child(selected))
+                .child(after);
+        }
+
+        if is_focused && !self.disabled {
+            let text = display_text.to_string();
+            let pos = self.cursor_pos.min(text.len());
+            let before = text[..pos].to_string();
+            let after = text[pos..].to_string();
+            return div()
+                .flex()
+                .flex_1()
+                .text_color(color)
+                .child(before)
+                .child(div().w(px(1.5)).h_full().bg(self.text_color))
                 .child(after);
         }
 
