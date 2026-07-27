@@ -8,5 +8,5 @@ pub use divider::{
 };
 pub use panes::{
     bottom_bar::BottomBar, hello_world::HelloWorld, hello_world1::HelloWorld1,
-    info_bottom_bar::InfoBottomBar,
+    info_bottom_bar::InfoBottomBar, left_bar::LeftBar,
 };
