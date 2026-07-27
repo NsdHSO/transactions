@@ -1,5 +1,5 @@
-use crate::divider::ResizeHandle;
-use crate::panes::BottomBar;
+use components::divider::ResizeHandle;
+use components::panes::BottomBar;
 use gpui::{
     AppContext, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, px, rgb,
 };

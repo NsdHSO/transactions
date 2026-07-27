@@ -1,7 +1,8 @@
 use components::HelloWorld;
-use components::panes::{Dsp, HelloWorld1, Toolbar};
+use components::panes::{HelloWorld1, Toolbar};
 use components::route::Route;
 use danubius::components::dropdown::{Dropdown, MenuEntry};
+use dsp::Dsp;
 use gpui::prelude::FluentBuilder;
 use gpui::{
     AppContext, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, px,
