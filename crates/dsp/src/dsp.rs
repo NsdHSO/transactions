@@ -1,3 +1,4 @@
+use components::InfoBottomBar;
 use components::divider::ResizeHandle;
 use components::panes::BottomBar;
 use gpui::{
@@ -7,6 +8,7 @@ use zalmoxis::ActiveTheme;
 
 pub struct Dsp {
     bottom_bar: Entity<BottomBar>,
+    info_bar: Entity<InfoBottomBar>,
     handle: Entity<ResizeHandle>,
 }
 
@@ -20,6 +22,7 @@ impl Dsp {
 
         Self {
             bottom_bar: cx.new(|_| BottomBar),
+            info_bar: cx.new(|_| InfoBottomBar),
             handle,
         }
     }
@@ -48,5 +51,6 @@ impl Render for Dsp {
             )
             .child(self.handle.clone())
             .child(div().h(px(height)).child(self.bottom_bar.clone()))
+            .child(div().h(px(20.0)).child(self.info_bar.clone()))
     }
 }
