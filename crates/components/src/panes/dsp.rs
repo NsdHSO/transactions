@@ -1,24 +1,34 @@
+use crate::divider::ResizeHandle;
 use crate::panes::BottomBar;
 use gpui::{
-    AppContext, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, rgb,
+    AppContext, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, px, rgb,
 };
 use zalmoxis::ActiveTheme;
 
 pub struct Dsp {
     bottom_bar: Entity<BottomBar>,
+    handle: Entity<ResizeHandle>,
 }
 
 impl Dsp {
     pub fn new(cx: &mut Context<Self>) -> Self {
+        let handle = cx.new(|_| ResizeHandle::vertical(32.0, 32.0, 800.0));
+
+        let _ = cx.observe(&handle, |_, _handle, cx| {
+            cx.notify();
+        });
+
         Self {
             bottom_bar: cx.new(|_| BottomBar),
+            handle,
         }
     }
 }
 
 impl Render for Dsp {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        let colors = _cx.zalmoxis_colors();
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let colors = cx.zalmoxis_colors();
+        let height = self.handle.read(cx).value;
 
         div()
             .flex()
@@ -36,6 +46,7 @@ impl Render for Dsp {
                     .text_color(rgb(0xffffff))
                     .child("DSP Screen"),
             )
-            .child(self.bottom_bar.clone())
+            .child(self.handle.clone())
+            .child(div().h(px(height)).child(self.bottom_bar.clone()))
     }
 }

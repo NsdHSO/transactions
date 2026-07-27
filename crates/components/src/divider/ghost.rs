@@ -15,3 +15,19 @@ impl Render for DividerGhost {
             .top(self.position.y)
     }
 }
+
+pub struct BottomBarGhost {
+    pub y: f32,
+}
+
+impl Render for BottomBarGhost {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+        div()
+            .absolute()
+            .h(px(2.0))
+            .w_full()
+            .bg(rgb(0x00aaff))
+            .top(px(self.y))
+            .left(px(0.0))
+    }
+}
