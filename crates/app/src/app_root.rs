@@ -1,5 +1,6 @@
 use components::HelloWorld;
-use components::panes::{HelloWorld1, Toolbar};
+use components::panes::{Dsp, HelloWorld1, Toolbar};
+use components::route::Route;
 use danubius::components::dropdown::{Dropdown, MenuEntry};
 use gpui::prelude::FluentBuilder;
 use gpui::{
@@ -11,6 +12,7 @@ use zalmoxis::{ActiveTheme, Appearance, set_appearance};
 pub struct AppRoot {
     toolbar: Entity<Toolbar>,
     split: Entity<Split>,
+    dsp: Entity<Dsp>,
 }
 
 impl AppRoot {
@@ -25,6 +27,7 @@ impl AppRoot {
             right,
             left_width: 500.0,
         });
+        let dsp = cx.new(Dsp::new);
 
         let _ = cx.observe(
             &toolbar,
@@ -33,7 +36,11 @@ impl AppRoot {
             },
         );
 
-        Self { toolbar, split }
+        Self {
+            toolbar,
+            split,
+            dsp,
+        }
     }
 }
 
@@ -41,6 +48,7 @@ impl Render for AppRoot {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let toolbar_entity = self.toolbar.clone();
         let open = self.toolbar.read(cx).dropdown_open;
+        let route = self.toolbar.read(cx).current_route;
 
         let theme_label = match cx.zalmoxis_appearance() {
             Appearance::Light => "☾  Dark theme",
@@ -52,7 +60,10 @@ impl Render for AppRoot {
             .flex_col()
             .size_full()
             .child(self.toolbar.clone())
-            .child(div().flex_1().child(self.split.clone()))
+            .child(match route {
+                Route::Dsp => div().flex_1().child(self.dsp.clone()).into_element(),
+                Route::Split => div().flex_1().child(self.split.clone()).into_element(),
+            })
             .when(open, |this| {
                 this.child(
                     div()
