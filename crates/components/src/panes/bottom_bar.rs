@@ -10,7 +10,7 @@ impl Render for BottomBar {
         div()
             .flex()
             .items_center()
-            .h(px(32.0))
+            .h_full()
             .px(px(12.0))
             .bg(colors.surface)
             .border_t_1()
