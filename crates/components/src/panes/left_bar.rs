@@ -11,7 +11,7 @@ impl Render for LeftBar {
             .flex()
             .items_center()
             .h_full()
-            .w_7()
+            .w_9()
             .bg(colors.surface)
             .border_l_1()
             .border_color(colors.outline_variant)
