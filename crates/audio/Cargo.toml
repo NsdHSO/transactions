@@ -1,5 +1,5 @@
 [package]
-name = "dsp"
+name = "audio"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -7,11 +7,10 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-audio.workspace = true
-components = { path = "../components" }
-gpui.workspace = true
-zalmoxis.workspace = true
-log = "0.4.33"
+serde.workspace = true
+thiserror.workspace = true
+coreaudio-rs.workspace = true
+coreaudio-sys.workspace = true
 
 [lints.clippy]
 all = "warn"
