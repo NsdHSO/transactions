@@ -83,5 +83,12 @@ fn pid_to_name(p0: i32) -> String {
 }
 
 fn enumerate_running_processes() -> Vec<(i32, bool)> {
+    let addr = AudioObjectPropertyAddress {
+        mSelector: kAudioHardwarePropertyProcessObjectList,
+        mScope: kAudioObjectPropertyScopeGlobal,
+        mElement: kAudioObjectPropertyElementMain,
+    };
+    let mut data_size: u32 = 0;
+
     vec![(2, true), (3, false)]
 }
