@@ -11,6 +11,6 @@ serde.workspace = true
 thiserror.workspace = true
 coreaudio-rs.workspace = true
 coreaudio-sys.workspace = true
-
+libc.workspace = true
 [lints.clippy]
 all = "warn"
