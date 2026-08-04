@@ -1,7 +1,7 @@
 use components::divider::ResizeHandle;
 use components::panes::BottomBar;
 use components::{InfoBottomBar, LeftBar};
-use design_pattern::logistics::{Logistics, Truck};
+use design_pattern::factory_method::logistics::{Logistics, Truck};
 use gpui::{
     AppContext, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, px, rgb,
 };
