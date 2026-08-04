@@ -1,6 +1,7 @@
 use components::divider::ResizeHandle;
 use components::panes::BottomBar;
 use components::{InfoBottomBar, LeftBar};
+use design_pattern::logistics::{Logistics, Truck};
 use gpui::{
     AppContext, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, px, rgb,
 };
@@ -11,6 +12,7 @@ pub struct Dsp {
     info_bar: Entity<InfoBottomBar>,
     left_bar: Entity<LeftBar>,
     handle: Entity<ResizeHandle>,
+    logistic: Logistics,
 }
 
 impl Dsp {
@@ -20,12 +22,16 @@ impl Dsp {
         let _ = cx.observe(&handle, |_, _handle, cx| {
             cx.notify();
         });
+        let truck1 = Truck { whells: 4 };
+        let mut logistic = Logistics { trucks: vec![] };
 
+        logistic.trucks.push(truck1);
         Self {
             bottom_bar: cx.new(|_| BottomBar),
             left_bar: cx.new(|_| LeftBar),
             info_bar: cx.new(|_| InfoBottomBar),
             handle,
+            logistic,
         }
     }
 }
@@ -46,6 +52,23 @@ impl Render for Dsp {
                     .flex()
                     .flex_col()
                     .flex_1()
+                    .child(
+                        div()
+                            .justify_center()
+                            .items_center()
+                            .text_xl()
+                            .text_color(rgb(0xffffff))
+                            .flex()
+                            .child(
+                                div()
+                                    .flex()
+                                    .p_8()
+                                    .justify_between()
+                                    .child("Logistics Truck Len")
+                                    .flex_1()
+                                    .child(self.logistic.trucks.len().to_string()),
+                            ),
+                    )
                     .child(
                         div()
                             .flex()

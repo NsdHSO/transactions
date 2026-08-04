@@ -10,6 +10,7 @@ repository.workspace = true
 gpui.workspace = true
 zalmoxis.workspace = true
 components = { path = "../components" }
+design_pattern =  { path = "../design_pattern/"} 
 
 [lints.clippy]
 all = "warn"
