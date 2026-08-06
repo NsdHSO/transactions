@@ -1,3 +1,5 @@
+use crate::factory_method::ship::Ship;
+
 #[derive(Debug)]
 pub struct Truck {
     pub whells: u32,
@@ -6,4 +8,5 @@ pub struct Truck {
 #[derive(Debug)]
 pub struct Logistics {
     pub trucks: Vec<Truck>,
+    pub ship: Vec<Ship>,
 }

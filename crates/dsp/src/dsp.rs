@@ -2,6 +2,7 @@ use components::divider::ResizeHandle;
 use components::panes::BottomBar;
 use components::{InfoBottomBar, LeftBar};
 use design_pattern::factory_method::logistics::{Logistics, Truck};
+use design_pattern::factory_method::ship::Ship;
 use gpui::{
     AppContext, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, px, rgb,
 };
@@ -23,9 +24,14 @@ impl Dsp {
             cx.notify();
         });
         let truck1 = Truck { whells: 4 };
-        let mut logistic = Logistics { trucks: vec![] };
+        let ship_1 = Ship { fuel: true };
+        let mut logistic = Logistics {
+            trucks: vec![],
+            ship: vec![],
+        };
 
         logistic.trucks.push(truck1);
+        logistic.ship.push(ship_1);
         Self {
             bottom_bar: cx.new(|_| BottomBar),
             left_bar: cx.new(|_| LeftBar),
@@ -69,6 +75,12 @@ impl Render for Dsp {
                                     .child(self.logistic.trucks.len().to_string()),
                             ),
                     )
+                    .children(self.logistic.ship.iter().map(|ship| {
+                        div()
+                            .text_xl()
+                            .text_color(rgb(0xffffff))
+                            .child(ship.fuel.to_string())
+                    }))
                     .child(
                         div()
                             .flex()
