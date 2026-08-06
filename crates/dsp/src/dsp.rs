@@ -1,6 +1,9 @@
 use components::divider::ResizeHandle;
 use components::panes::BottomBar;
 use components::{InfoBottomBar, LeftBar};
+use design_pattern::factory_method::logistics::{Logistics, Truck};
+use design_pattern::factory_method::ship::Ship;
+use design_pattern::factory_method::type_cargo::CargoType;
 use gpui::{
     AppContext, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, px, rgb,
 };
@@ -11,6 +14,7 @@ pub struct Dsp {
     info_bar: Entity<InfoBottomBar>,
     left_bar: Entity<LeftBar>,
     handle: Entity<ResizeHandle>,
+    logistic: Logistics,
 }
 
 impl Dsp {
@@ -20,12 +24,24 @@ impl Dsp {
         let _ = cx.observe(&handle, |_, _handle, cx| {
             cx.notify();
         });
+        let truck1 = Truck { whells: 4 };
+        let ship_1 = Ship {
+            fuel: true,
+            cargo: CargoType::Oil,
+        };
+        let mut logistic = Logistics {
+            trucks: vec![],
+            ship: vec![],
+        };
 
+        logistic.trucks.push(truck1);
+        logistic.ship.push(ship_1);
         Self {
             bottom_bar: cx.new(|_| BottomBar),
             left_bar: cx.new(|_| LeftBar),
             info_bar: cx.new(|_| InfoBottomBar),
             handle,
+            logistic,
         }
     }
 }
@@ -46,6 +62,29 @@ impl Render for Dsp {
                     .flex()
                     .flex_col()
                     .flex_1()
+                    .child(
+                        div()
+                            .justify_center()
+                            .items_center()
+                            .text_xl()
+                            .text_color(rgb(0xffffff))
+                            .flex()
+                            .child(
+                                div()
+                                    .flex()
+                                    .p_8()
+                                    .justify_between()
+                                    .child("Logistics Truck Len")
+                                    .flex_1()
+                                    .child(self.logistic.trucks.len().to_string()),
+                            ),
+                    )
+                    .children(self.logistic.ship.iter().map(|ship| {
+                        div()
+                            .text_xl()
+                            .text_color(rgb(0xffffff))
+                            .child(ship.fuel.to_string())
+                    }))
                     .child(
                         div()
                             .flex()
