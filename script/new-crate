@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Create a new crate in crates/<name> following workspace conventions.
+# Usage:
+#   script/new-crate <crate-name>
+set -euo pipefail
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <crate-name>" >&2
+    exit 1
+fi
+
+NAME="$1"
+
+# Crate names must be valid (lowercase ASCII, letters/digits/_/-).
+if ! [[ "$NAME" =~ ^[a-z0-9_-]+$ ]]; then
+    echo "Error: invalid crate name '$NAME'. Use lowercase letters, digits, '-' or '_'." >&2
+    exit 1
+fi
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+DIR="$ROOT/crates/$NAME"
+
+if [ -e "$DIR" ]; then
+    echo "Error: $DIR already exists." >&2
+    exit 1
+fi
+
+mkdir -p "$DIR/src"
+
+cat > "$DIR/Cargo.toml" <<EOF
+[package]
+name = "$NAME"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+
+[lints.clippy]
+all = "warn"
+EOF
+
+cat > "$DIR/src/lib.rs" <<EOF
+pub fn ${NAME//-/_}() {
+    println!("Hello from $NAME");
+}
+EOF
+
+echo "Created crate at $DIR"
