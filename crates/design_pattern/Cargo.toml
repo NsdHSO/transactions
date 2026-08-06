@@ -1,0 +1,6 @@
+[package]
+name = "design_pattern"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
