@@ -8,5 +8,5 @@ pub struct Truck {
 #[derive(Debug)]
 pub struct Logistics {
     pub trucks: Vec<Truck>,
-    pub ship: Vec<Ship>,
+    pub ships: Vec<Ship>,
 }

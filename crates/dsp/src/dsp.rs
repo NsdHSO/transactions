@@ -31,11 +31,11 @@ impl Dsp {
         };
         let mut logistic = Logistics {
             trucks: vec![],
-            ship: vec![],
+            ships: vec![],
         };
 
         logistic.trucks.push(truck1);
-        logistic.ship.push(ship_1);
+        logistic.ships.push(ship_1);
         Self {
             bottom_bar: cx.new(|_| BottomBar),
             left_bar: cx.new(|_| LeftBar),
@@ -79,7 +79,7 @@ impl Render for Dsp {
                                     .child(self.logistic.trucks.len().to_string()),
                             ),
                     )
-                    .children(self.logistic.ship.iter().map(|ship| {
+                    .children(self.logistic.ships.iter().map(|ship| {
                         div()
                             .text_xl()
                             .text_color(rgb(0xffffff))
