@@ -1,6 +1,7 @@
 use components::divider::ResizeHandle;
 use components::panes::BottomBar;
 use components::{InfoBottomBar, LeftBar};
+use danubius::components::button::Button;
 use design_pattern::factory_method::logistics::{Logistics, Truck};
 use design_pattern::factory_method::ship::Ship;
 use design_pattern::factory_method::type_cargo::CargoType;
@@ -14,7 +15,7 @@ pub struct Dsp {
     info_bar: Entity<InfoBottomBar>,
     left_bar: Entity<LeftBar>,
     handle: Entity<ResizeHandle>,
-    logistic: Logistics,
+    logistic: Entity<Logistics>,
 }
 
 impl Dsp {
@@ -29,13 +30,11 @@ impl Dsp {
             fuel: true,
             cargo: CargoType::Oil,
         };
-        let mut logistic = Logistics {
-            trucks: vec![],
-            ships: vec![],
-        };
+        let logistic = cx.new(|_| Logistics {
+            trucks: vec![truck1],
+            ships: vec![ship_1],
+        });
 
-        logistic.trucks.push(truck1);
-        logistic.ships.push(ship_1);
         Self {
             bottom_bar: cx.new(|_| BottomBar),
             left_bar: cx.new(|_| LeftBar),
@@ -50,7 +49,7 @@ impl Render for Dsp {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let colors = cx.zalmoxis_colors();
         let height = self.handle.read(cx).value;
-
+        let logistics = self.logistic.clone();
         div()
             .flex()
             .flex_row()
@@ -76,10 +75,10 @@ impl Render for Dsp {
                                     .justify_between()
                                     .child("Logistics Truck Len")
                                     .flex_1()
-                                    .child(self.logistic.trucks.len().to_string()),
+                                    .child(self.logistic.read(cx).trucks.len().to_string()),
                             ),
                     )
-                    .children(self.logistic.ships.iter().map(|ship| {
+                    .children(self.logistic.read(cx).ships.iter().map(|ship| {
                         div()
                             .text_xl()
                             .text_color(rgb(0xffffff))
@@ -96,6 +95,9 @@ impl Render for Dsp {
                             .text_color(rgb(0xffffff))
                             .child("DSP Screen"),
                     )
+                    .child(Button::new("Show Dispaced").on_click(move |_ev, _win, cx| {
+                        logistics.read(cx).count_how_many_was_dispaced()
+                    }))
                     .child(self.handle.clone())
                     .child(div().h(px(height)).child(self.bottom_bar.clone()))
                     .child(div().h(px(30.0)).child(self.info_bar.clone())),

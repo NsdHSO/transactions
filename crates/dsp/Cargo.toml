@@ -11,6 +11,6 @@ gpui.workspace = true
 zalmoxis.workspace = true
 components = { path = "../components" }
 design_pattern =  { path = "../design_pattern/"} 
-
+danubius.workspace = true
 [lints.clippy]
 all = "warn"
