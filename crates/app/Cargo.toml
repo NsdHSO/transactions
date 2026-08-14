@@ -15,6 +15,7 @@ danubius.workspace = true
 components = { path = "../components" }
 dsp = { path = "../dsp" }
 split = { path = "../split" }
+tokio.workspace = true
 
 [lints.clippy]
 all = "warn"
