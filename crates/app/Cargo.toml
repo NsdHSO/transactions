@@ -5,6 +5,11 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+autobins = false
+
+[[bin]]
+name = "app"
+path = "src/main.rs"
 
 [dependencies]
 gpui.workspace = true
