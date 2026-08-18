@@ -40,3 +40,9 @@ fn main() {
 // You can't extend or modify their definition by creating children of the struct.
 // A Rust struct is what it is.
 //
+// A traits are much more accuarately thought of as contracts.
+//
+// Polymorphism is build into the essence of classes in most modern OO Language. There is an
+// inherent expectation that child classes are interchangeable with their parents and siblings.
+//
+// The Borrow checker prevents object patterns
