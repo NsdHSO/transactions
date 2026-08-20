@@ -46,3 +46,12 @@ fn main() {
 // inherent expectation that child classes are interchangeable with their parents and siblings.
 //
 // The Borrow checker prevents object patterns
+// Borrow checker makes us think much more carfully about the movement and sharing of data
+//
+// Pulling it together: types are not object
+//
+// We may not call structs and enums objects, but they are collections of data.
+// They allow collections of data and their 'impl' blocks allow us to group specific code with
+// specific structures.21
+//
+// Misusing traits
