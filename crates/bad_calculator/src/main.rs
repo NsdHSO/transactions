@@ -55,3 +55,5 @@ fn main() {
 // specific structures.21
 //
 // Misusing traits
+// Traits exist to provide contracts that structs can fulfil, which adds expressiveness and
+// flexibility to the language.
