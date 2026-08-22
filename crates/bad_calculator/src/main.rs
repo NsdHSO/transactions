@@ -1,7 +1,3 @@
-use std::io::{Write, stdin, stdout};
-
-use bad_calculator::evaluat_expression;
-
 fn main() {
     // let mut buffer = String::new();
     // let stdin = stdin();
