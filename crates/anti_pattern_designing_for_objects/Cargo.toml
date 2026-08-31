@@ -1,0 +1,12 @@
+[package]
+name = "anti_pattern_designing_for_objects"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+
+[lints.clippy]
+all = "warn"

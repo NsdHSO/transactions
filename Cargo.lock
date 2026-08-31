@@ -211,6 +211,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "anti_pattern_designing_for_objects"
+version = "0.1.0"
+
+[[package]]
 name = "anyhow"
 version = "1.0.102"
 source = "registry+https://github.com/rust-lang/crates.io-index"
