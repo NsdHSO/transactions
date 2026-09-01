@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn main() {
     // let mut buffer = String::new();
     // let stdin = stdin();
@@ -115,6 +117,7 @@ struct CalculationResult {
 struct Calculator {
     history: Vec<CalculationResult>,
     current_expression: Option<String>,
+    variables: HashMap<String, Variable>,
 }
 
 trait HistoryViewer {
@@ -132,9 +135,32 @@ impl Calculator {
         Self {
             history: Vec::new(),
             current_expression: None,
+            variables: HashMap::new(),
         }
     }
 }
+
+impl HistoryViewer for Calculator {
+    fn view_history(&self) -> &[CalculationResult] {
+        todo!()
+    }
+
+    fn get_last_result(&self) -> Option<f64> {
+        todo!()
+    }
+}
+
+struct Variable {
+    name: String,
+    value: f64,
+}
+
+enum Token<'a> {
+    Number(f64),
+    Variable(&'a Variable),
+    Operator(char),
+}
+
 enum Operator {
     Addition { lhs: Value, rhs: Value },
     Substraction { lhs: Value, rhs: Value },
@@ -163,3 +189,11 @@ impl Operator {
         }
     }
 }
+
+//Smart Pointers such as RC and RefCell
+// Rc is appropriate for share ownership in single-threaded
+//
+// RefCell is useful for implementing interior mutability patterns where mutability is truly needed
+// behind an immutable reference.
+//
+// Arc and Mutex RwLock are variants of these building blocks for thread-safe and async.
