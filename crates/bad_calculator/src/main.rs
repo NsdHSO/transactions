@@ -1,6 +1,49 @@
 use std::collections::HashMap;
 
+fn weird_algo(mut n: i32) {
+    while n != 1 {
+        if (n % 2 == 0) {
+            n = n / 2
+        } else {
+            n = n * 3 + 1
+        }
+    }
+}
+fn missing_number(n: i64, numbers: &[i64]) -> i64 {
+    if n < 2 || numbers.len() < 2 {
+        0
+    } else {
+        let expected = n * (n + 1) / 2;
+        let actual: i64 = numbers.iter().sum();
+
+        expected - actual
+    }
+}
+
+fn repetition(n: &str) -> i32 {
+    if (n.len() < 1) {
+        0
+    } else {
+        let mut max_len = 1;
+        let mut curr_len = 1;
+        let mut prev = n.chars().next().unwrap();
+        println!("{:?}", prev);
+        for c in n.chars().skip(1) {
+            if (c == prev) {
+                curr_len += 1;
+                max_len = max_len.max(curr_len)
+            } else {
+                curr_len = 1;
+                prev = c
+            }
+        }
+        max_len
+    }
+}
 fn main() {
+    weird_algo(4);
+    println!("{:?}", missing_number(3, &[1, 3]));
+    println!("Test repetition: {:?}", repetition(&"testsssst"));
     // let mut buffer = String::new();
     // let stdin = stdin();
 
